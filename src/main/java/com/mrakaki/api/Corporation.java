@@ -4,7 +4,6 @@ import com.mrakaki.api.dtos.*;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.mrakaki.api.Common.getMultiEntity;
 import static com.mrakaki.api.Common.getSingleEntity;
