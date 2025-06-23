@@ -1,11 +1,11 @@
-import com.mrakaki.api.Character;
-import com.mrakaki.api.Common;
+package com.mrakaki.api;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
 
-public class CharacterTest {
+public class CharacterTests {
 
     @Test
     public void TestCharacterPublicInformation() {
@@ -20,7 +20,7 @@ public class CharacterTest {
     @Test
     public void TestCharacterPortrait() {
         Common.SetUserAgent("MrAkaki Tests");
-        var portraitInfo = Character.getCharacterPortrait(2120599058);
+        var portraitInfo = Character.getCharacterPortrait(98659319);
         Assert.assertEquals(portraitInfo.error(), Optional.empty());
         Assert.assertEquals(portraitInfo.actualPage(), 0);
         Assert.assertEquals(portraitInfo.totalPages(), 1);
