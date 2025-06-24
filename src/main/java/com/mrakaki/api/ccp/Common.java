@@ -1,4 +1,4 @@
-package com.mrakaki.api;
+package com.mrakaki.api.ccp;
 
 import com.mrakaki.api.dtos.Error;
 import com.mrakaki.api.dtos.Response;

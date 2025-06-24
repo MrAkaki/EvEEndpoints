@@ -1,4 +1,4 @@
-package com.mrakaki.api;
+package com.mrakaki.api.ccp;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -10,7 +10,7 @@ public class CharacterTests {
     @Test
     public void TestCharacterPublicInformation() {
         Common.SetUserAgent("MrAkaki Tests");
-        var publicInfo = Character.getPublicInformation(2120599058);
+        var publicInfo = com.mrakaki.api.ccp.Character.getPublicInformation(2120599058);
         Assert.assertEquals(publicInfo.error(), Optional.empty());
         Assert.assertEquals(publicInfo.actualPage(), 0);
         Assert.assertEquals(publicInfo.totalPages(), 1);

@@ -1,10 +1,10 @@
-package com.mrakaki.api;
+package com.mrakaki.api.ccp;
 
 import com.mrakaki.api.dtos.CharacterPortrait;
 import com.mrakaki.api.dtos.CharacterPublicInformation;
 import com.mrakaki.api.dtos.Response;
 
-import static com.mrakaki.api.Common.getSingleEntity;
+import static com.mrakaki.api.ccp.Common.getSingleEntity;
 
 public class Character {
     public static final String URI_PUBLIC_INFORMATION = "/characters/{character_id}/";

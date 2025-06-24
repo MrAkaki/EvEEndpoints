@@ -1,12 +1,12 @@
-package com.mrakaki.api;
+package com.mrakaki.api.ccp;
 
 import com.mrakaki.api.dtos.*;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.ArrayList;
 
-import static com.mrakaki.api.Common.getMultiEntity;
-import static com.mrakaki.api.Common.getSingleEntity;
+import static com.mrakaki.api.ccp.Common.getMultiEntity;
+import static com.mrakaki.api.ccp.Common.getSingleEntity;
 
 public class Corporation {
     public static final String URI_PUBLIC_INFORMATION = "/corporations/{corporation_id}/";

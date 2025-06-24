@@ -1,4 +1,4 @@
-package com.mrakaki.api;
+package com.mrakaki.api.ccp;
 
 import org.testng.annotations.Test;
 
