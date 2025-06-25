@@ -91,7 +91,7 @@ public class ZKillboard {
             }
         }
         connectionThread = new Thread(() -> {
-            while (clientStatus.get() == ClientStatus.CONNECTED.ordinal() && !connectionThread.isInterrupted()) {
+            while (!connectionThread.isInterrupted()) {
                 try {
                     if (clientStatus.get() != ClientStatus.CONNECTED.ordinal()) {
                         System.err.println("WebSocket client is not open, attempting to reconnect...");
