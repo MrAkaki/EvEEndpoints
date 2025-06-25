@@ -4,12 +4,12 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -18,13 +18,31 @@ public class ZKillboard {
 
 
     private final Map<String, Consumer<JSONObject>> messageHandlers;
-    private final AtomicInteger clientStatus = new AtomicInteger(ClientStatus.CONNECTING.ordinal());
+    private final AtomicInteger clientStatus = new AtomicInteger(ClientStatus.DISCONNECTED.ordinal());
+    private final AtomicBoolean restartIfDisconnected = new AtomicBoolean(false);
     private WebSocketClient webSocketClient;
 
     private Thread connectionThread;
 
     public ZKillboard() {
         this.messageHandlers = new HashMap<>();
+        connectionThread = new Thread(() -> {
+            while (!connectionThread.isInterrupted()) {
+                try {
+                    if (restartIfDisconnected.get()) {
+                        if (clientStatus.get() != ClientStatus.CONNECTED.ordinal()) {
+                            System.err.println("WebSocket client is not open, attempting to reconnect...");
+                            reConnect();
+                        }
+                    }
+                    Thread.sleep(1000); // Keep the thread alive to maintain the connection
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("Connection thread interrupted: " + e.getMessage());
+                }
+            }
+        });
+        connectionThread.start();
     }
 
     public ZKillboard connect() {
@@ -90,22 +108,7 @@ public class ZKillboard {
                 System.err.println("Connection interrupted: " + e.getMessage());
             }
         }
-        connectionThread = new Thread(() -> {
-            while (!connectionThread.isInterrupted()) {
-                try {
-                    if (clientStatus.get() != ClientStatus.CONNECTED.ordinal()) {
-                        System.err.println("WebSocket client is not open, attempting to reconnect...");
-                        reConnect();
-                        connectionThread.interrupt();
-                    }
-                    Thread.sleep(1000); // Keep the thread alive to maintain the connection
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    System.err.println("Connection thread interrupted: " + e.getMessage());
-                }
-            }
-        });
-        connectionThread.start();
+        restartIfDisconnected.set(true);
         return this;
     }
 
@@ -121,13 +124,15 @@ public class ZKillboard {
     }
 
     public ZKillboard disconnect() {
+        restartIfDisconnected.set(false);
         if (webSocketClient != null && webSocketClient.isOpen()) {
-            connectionThread.interrupt();
             webSocketClient.close();
         }
-        while (clientStatus.get() != ClientStatus.DISCONNECTED.ordinal() && clientStatus.get() != ClientStatus.ERROR.ordinal()) {
+        int retryCount = 0;
+        while (clientStatus.get() != ClientStatus.DISCONNECTED.ordinal() && clientStatus.get() != ClientStatus.ERROR.ordinal() && retryCount < 600) {
             try {
                 Thread.sleep(100); // Wait for connection to establish
+                retryCount++;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.err.println("Connection interrupted: " + e.getMessage());
