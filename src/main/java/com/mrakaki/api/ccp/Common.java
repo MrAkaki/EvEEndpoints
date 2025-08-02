@@ -28,19 +28,20 @@ public class Common {
         if (userAgent == null || userAgent.isEmpty()) {
             System.err.println("Common::userAgent is empty, please set a correct value with Common::SetUserAgent, check: https://developers.eveonline.com/docs/services/esi/best-practices/");
         }
-        return GetRestClient("Standard", Map.of(HttpHeaders.USER_AGENT, userAgent));
+        return GetRestClient("Standard", Map.of());
     }
 
     public static RestClient GetRestClient(String clientId, Map<String, String> options) {
-        if (restClient == null) {
-            restClient = new HashMap<>();
-        }
+        if (restClient == null) restClient = new HashMap<>();
         var rc = restClient.get(clientId);
         if (rc == null) {
-
             var rcb = RestClient.builder()
                     .baseUrl(baseUrl)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                    .defaultHeader("X-Compatibility-Date", "2020-01-01")
+                    .defaultHeader("X-Tenant", "tranquility")
+                    .defaultHeader("Accept-Language", "en")
+                    .defaultHeader(HttpHeaders.USER_AGENT, userAgent)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             options.forEach((k, v) -> {
                 rcb.defaultHeader(k, v).build();
@@ -51,7 +52,7 @@ public class Common {
         return rc;
     }
 
-    public static <T> Response<T> getSingleEntity(Class<T> type, String url) {
+    public static <T> Response<T> getSingleEntity(Class<T> type, String url, Map<String, String> headers) {
         var restClient = Common.GetRestClient();
         var request = restClient.get().uri(url).retrieve().toEntity(type);
         var eTagList = request.getHeaders().get("ETag");
@@ -69,8 +70,12 @@ public class Common {
         return response;
     }
 
-    public static <T> Response<ArrayList<T>> getMultiEntity(String url,ParameterizedTypeReference<ArrayList<T>> typeRef) {
-        var restClient = Common.GetRestClient();
+    public static <T> Response<ArrayList<T>> getMultiEntity(String url, ParameterizedTypeReference<ArrayList<T>> typeRef) {
+        return getMultiEntity(url, typeRef, null);
+    }
+
+    public static <T> Response<ArrayList<T>> getMultiEntity(String url, ParameterizedTypeReference<ArrayList<T>> typeRef, String token) {
+        var restClient = Common.GetRestClient("WithToken", Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
         var request = restClient.get().uri(url).retrieve().toEntity(typeRef);
         var eTagList = request.getHeaders().get("ETag");
         var eTag = eTagList == null ? null : eTagList.getFirst();

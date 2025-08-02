@@ -41,5 +41,13 @@ var corporationInformation = Corporation.GetCorporationInformation(98659319);
 
 # Available Endpoints
 - **Character Endpoints**
-  - `GetCharacterInformation(long characterId)`
-  - `GetCharacterPortraits(long characterId)`
+  - `getPublicInformation(int characterId)`
+  - `getCharacterPortrait(int characterId)`
+- **Corportation Endpoints**
+  - `getPublicInformation(int corporationId)`
+  - `getAllianceHistory(int corporationId)`
+- **Alliance Endpoints**
+  - `getPublicInformation(int allianceId)`
+  - `getAllAlliances()`
+  - `getIcons(int allianceId)`
+  - `getAllianceCorporations(int allainceId)`
