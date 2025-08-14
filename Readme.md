@@ -40,6 +40,9 @@ var corporationInformation = Corporation.GetCorporationInformation(98659319);
 ```
 
 # Available Endpoints
+- **Authentication Endpoints**
+  - `ProcessCode(String code, String clientId, String clientSecret, String tokenUrl)`
+  - `GetAuthenticationUrl(String redirectUrl, String authorizationUrl, String clientId, Set<String> characterScopes, String state)`
 - **Character Endpoints**
   - `getPublicInformation(int characterId)`
   - `getCharacterPortrait(int characterId)`
