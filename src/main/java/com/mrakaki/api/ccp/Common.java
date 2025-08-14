@@ -52,8 +52,12 @@ public class Common {
         return rc;
     }
 
-    public static <T> Response<T> getSingleEntity(Class<T> type, String url, Map<String, String> headers) {
-        var restClient = Common.GetRestClient();
+    public static <T> Response<T> getSingleEntity(Class<T> type, String url) {
+       return getSingleEntity(type,url,null);
+    }
+
+    public static <T> Response<T> getSingleEntity(Class<T> type, String url, String token) {
+        var restClient = token ==null ? Common.GetRestClient() : Common.GetRestClient("WithToken"+token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
         var request = restClient.get().uri(url).retrieve().toEntity(type);
         var eTagList = request.getHeaders().get("ETag");
         var eTag = eTagList == null ? null : eTagList.getFirst();
@@ -75,7 +79,8 @@ public class Common {
     }
 
     public static <T> Response<ArrayList<T>> getMultiEntity(String url, ParameterizedTypeReference<ArrayList<T>> typeRef, String token) {
-        var restClient = Common.GetRestClient("WithToken", Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
+
+        var restClient = token ==null ? Common.GetRestClient() : Common.GetRestClient("WithToken"+token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
         var request = restClient.get().uri(url).retrieve().toEntity(typeRef);
         var eTagList = request.getHeaders().get("ETag");
         var eTag = eTagList == null ? null : eTagList.getFirst();
