@@ -43,9 +43,7 @@ public class Common {
                     .defaultHeader("Accept-Language", "en")
                     .defaultHeader(HttpHeaders.USER_AGENT, userAgent)
                     .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-            options.forEach((k, v) -> {
-                rcb.defaultHeader(k, v).build();
-            });
+            options.forEach((k, v) -> rcb.defaultHeader(k, v).build());
             rc = rcb.build();
             restClient.put(clientId, rc);
         }
@@ -53,11 +51,11 @@ public class Common {
     }
 
     public static <T> Response<T> getSingleEntity(Class<T> type, String url) {
-       return getSingleEntity(type,url,null);
+        return getSingleEntity(type, url, null);
     }
 
     public static <T> Response<T> getSingleEntity(Class<T> type, String url, String token) {
-        var restClient = token ==null ? Common.GetRestClient() : Common.GetRestClient("WithToken"+token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
+        var restClient = token == null ? Common.GetRestClient() : Common.GetRestClient("WithToken" + token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
         var request = restClient.get().uri(url).retrieve().toEntity(type);
         var eTagList = request.getHeaders().get("ETag");
         var eTag = eTagList == null ? null : eTagList.getFirst();
@@ -68,7 +66,11 @@ public class Common {
             if (request.getStatusCode().equals(HttpStatus.NOT_MODIFIED)) {
                 response = new Response<>(null, Optional.of(new com.mrakaki.api.dtos.Error(304, "Data not modified")), 0, 1, eTag);
             } else {
-                response = new Response<>(null, Optional.of(new Error(request.getStatusCode().value(), HttpStatus.resolve(request.getStatusCode().value()).getReasonPhrase())), 0, 1, null);
+                var resolution = HttpStatus.resolve(request.getStatusCode().value());
+                if (resolution == null) {
+                    resolution = HttpStatus.INTERNAL_SERVER_ERROR;
+                }
+                response = new Response<>(null, Optional.of(new Error(request.getStatusCode().value(), resolution.getReasonPhrase())), 0, 1, null);
             }
         }
         return response;
@@ -80,7 +82,7 @@ public class Common {
 
     public static <T> Response<ArrayList<T>> getMultiEntity(String url, ParameterizedTypeReference<ArrayList<T>> typeRef, String token) {
 
-        var restClient = token ==null ? Common.GetRestClient() : Common.GetRestClient("WithToken"+token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
+        var restClient = token == null ? Common.GetRestClient() : Common.GetRestClient("WithToken" + token.hashCode(), Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token));
         var request = restClient.get().uri(url).retrieve().toEntity(typeRef);
         var eTagList = request.getHeaders().get("ETag");
         var eTag = eTagList == null ? null : eTagList.getFirst();
@@ -91,7 +93,11 @@ public class Common {
             if (request.getStatusCode().equals(HttpStatus.NOT_MODIFIED)) {
                 response = new Response<>(null, Optional.of(new com.mrakaki.api.dtos.Error(304, "Data not modified")), 0, 1, eTag);
             } else {
-                response = new Response<>(null, Optional.of(new Error(request.getStatusCode().value(), HttpStatus.resolve(request.getStatusCode().value()).getReasonPhrase())), 0, 1, null);
+                var resolution = HttpStatus.resolve(request.getStatusCode().value());
+                if (resolution == null) {
+                    resolution = HttpStatus.INTERNAL_SERVER_ERROR;
+                }
+                response = new Response<>(null, Optional.of(new Error(request.getStatusCode().value(), resolution.getReasonPhrase())), 0, 1, null);
             }
         }
         return response;
