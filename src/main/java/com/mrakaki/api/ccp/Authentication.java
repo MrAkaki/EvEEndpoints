@@ -44,7 +44,7 @@ public class Authentication {
         }
     }
 
-    private static String GetAuthenticationUrl(String redirectUrl, String authorizationUrl, String clientId, Set<String> characterScopes, String state) {
+    public static String GetAuthenticationUrl(String redirectUrl, String authorizationUrl, String clientId, Set<String> characterScopes, String state) {
         return authorizationUrl + "?response_type=code&redirect_uri=" + encodeValue(redirectUrl) + "&client_id=" + clientId + "&scope=" + encodeValue(String.join(",", characterScopes)) + "&state=" + state;
     }
 
